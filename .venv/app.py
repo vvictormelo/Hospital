@@ -1,7 +1,7 @@
 import sqlite3 as sq
 
 
-class backend:
+class Backend:
     def conectadb(self):
         self.conn = sq.connect("hospital.db")
         self.cursor = self.conn.cursor()
@@ -24,9 +24,7 @@ class backend:
                                 bairro VARCHAR(20) NOT NULL,
                                 cidade VARCHAR(20) NOT NULL,
                                 cep VARCHAR(8) NOT NULL,
-                                telefone VARCHAR(10) NOT NULL,
-                                id_med_pac REFERENCES med_pac(id),
-                                id_med_enf REFERENCES med_enf(id))"""
+                                telefone VARCHAR(10) NOT NULL)"""
             )
 
             # Criação da tabela do medico
@@ -38,10 +36,7 @@ class backend:
                                 rua VARCHAR(50) NOT NULL,
                                 bairro VARCHAR(20) NOT NULL,
                                 cidade VARCHAR(20) NOT NULL,
-                                cep VARCHAR(8) NOT NULL,
-                                id_hosp_med REFERENCES hosp_med(id),
-                                id_med_pac REFERENCES med_pac(id),
-                                id_med_enf REFERENCES med_enf(id))"""
+                                cep VARCHAR(8) NOT NULL)"""
             )
 
             # Criação da tabela auxiliar hospital x medico
@@ -103,9 +98,7 @@ class backend:
                                 rua VARCHAR(50) NOT NULL,
                                 bairro VARCHAR(20) NOT NULL,
                                 cidade VARCHAR(20) NOT NULL,
-                                cep VARCHAR(8) NOT NULL,
-                                cnpj_hospital REFERENCES hospital(cnpj),
-                                crm_medico REFERENCES medico(crm))"""
+                                cep VARCHAR(8) NOT NULL)"""
             )
 
             # Criação da tabela paciente
@@ -116,8 +109,7 @@ class backend:
                                 rua VARCHAR(50) NOT NULL,
                                 bairro VARCHAR(20) NOT NULL,
                                 cidade VARCHAR(20) NOT NULL,
-                                cep VARCHAR(8) NOT NULL,
-                                crm_medico REFERENCES medico(crm))"""
+                                cep VARCHAR(8) NOT NULL)"""
             )
 
             self.conn.commit()
@@ -129,18 +121,59 @@ class backend:
         finally:
             self.desconectdb()
 
+    def inserthospital(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"CADASTRO DE HOSPITAL":>22}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
 
-class menufront(backend):
+        cnpj = int(input("CNPJ do Hospital: "))
+        nome = input("Nome do Hospital: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = int(input("CEP: "))
+        telefone = int(input("Telefone: "))
+
+        try:
+            self.conectadb()
+
+            self.cursor.execute(
+                """INSERT INTO hospital (cnpj, nome, rua, bairro, cidade, cep, telefone) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    cnpj,
+                    nome,
+                    rua,
+                    bairro,
+                    cidade,
+                    cep,
+                    telefone,
+                ),
+            )
+
+            self.conn.commit()
+
+            print("\033[1;36m\nHospital criado com sucesso!\033[m")
+
+        except sq.Error as e:
+            print("Erro!", e)
+
+        finally:
+            self.desconectdb()
+
+
+class menufront(Backend):
     def __init__(self):
         super().__init__()
         self.program()
 
     def menu(self):
         print("\n")
-        print("-=" * 15)
+        print("\033[1;36m-=\033[m" * 15)
         print(f'\033[1;36m{"MENU INICIAL":>22}\033[m')
-        print("-=" * 15)
+        print("\033[1;36m-=\033[m" * 15)
         print("\n1 - Criar tabelas")
+        print("2 - Criar hospital")
         print("4 - Sair")
 
     def program(self):
@@ -155,6 +188,8 @@ class menufront(backend):
                 match self.acao:
                     case 1:
                         self.criartabelas()
+                    case 2:
+                        self.inserthospital()
                     case 4:
                         self.acao = 4
                         print("\nSaindo... Até logo!")
