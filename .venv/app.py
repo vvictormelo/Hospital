@@ -409,6 +409,97 @@ class Enfermeira:
             db.desconectdb()
 
 
+class Paciente:
+    def __init__(self, cpf, nome, rua, bairro, cidade, cep):
+        self.cpf = cpf
+        self.nome = nome
+        self.rua = rua
+        self.bairro = bairro
+        self.cidade = cidade
+        self.cep = cep
+
+    def inserir_paciente(self):
+        query = "INSERT INTO paciente (cpf, nome, rua, bairro, cidade, cep) VALUES (?, ?, ?, ?, ?, ?)"
+        parametros = (
+            self.cpf,
+            self.nome,
+            self.rua,
+            self.bairro,
+            self.cidade,
+            self.cep,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nPaciente {self.nome}, inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir paciente:", e)
+
+        finally:
+            db.desconectdb()
+
+    def deletar_paciente(self):
+        query = "DELETE FROM paciente WHERE cpf = (?)"
+        parametros = (self.cpf,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+            print(
+                f"\033[1;36m\nDados do paciente {self.nome}, foram excluídos com sucesso!\033[m"
+            )
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao deletar paciente:", str(e))
+
+    def buscar_paciente(self):
+        query = "SELECT cpf, nome FROM paciente WHERE cpf = (?)"
+        parametros = (self.coren,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            for row in db.cursor.fetchall():
+                cpf_sl = row[0]
+                nome_sl = row[1]
+            print(f"\nCOREN: {cpf_sl}")
+            print(f"Nome: {nome_sl}")
+
+        except Exception as e:
+            print("Erro ao buscar paciente:", e)
+
+        finally:
+            db.desconectdb()
+
+    def alterar_paciente(self):
+        query = "UPDATE paciente SET cpf = ?, nome = ?, rua = ?, bairro = ?, cidade = ?, cep = ? WHERE cpf = (?)"
+        parametros = (
+            self.cpf,
+            self.nome,
+            self.rua,
+            self.bairro,
+            self.cidade,
+            self.cep,
+        )
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nPaciente {self.nome}, alterado com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("\033[1;31m\nErro ao alterar paciente:\033[m", e)
+
+        finally:
+            db.desconectdb()
+
+
 # Implementação do menu e chamada de métodos das entidades
 class menufront:
     def __init__(self):
@@ -436,6 +527,11 @@ class menufront:
         print("4 - Criar enfermeira(o)")
         print("4.1 - Deletar enfermeira(o)")
         print("4.2 - Alterar enfermeira(o)")
+        print("")
+        print("Paciente")
+        print("5 - Criar paciente")
+        print("5.1 - Deletar paciente")
+        print("5.2 - Alterar paciente")
         print("")
         print("7 - Sair")
 
@@ -469,6 +565,12 @@ class menufront:
                         self.delete_enfermeira()
                     case 4.2:
                         self.update_enfermeira()
+                    case 5:
+                        self.insert_paciente()
+                    case 5.1:
+                        self.delete_paciente()
+                    case 5.2:
+                        self.update_paciente()
                     case 7:
                         self.acao = 7
                         print("\nSaindo... Até logo!")
@@ -645,6 +747,60 @@ class menufront:
         enf = Enfermeira(coren, cpf, nome, rua, bairro, cidade, cep)
 
         enf.alterar_enfermeira()
+
+    # Instanciando métodos da entidade Paciente
+    def insert_paciente(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"CADASTRO DE PACIENTE":>25}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        cpf = input("CPF: ")
+        nome = input("Nome: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = input("CEP: ")
+
+        pac = Paciente(cpf, nome, rua, bairro, cidade, cep)
+
+        pac.inserir_paciente()
+
+    def delete_paciente(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"EXCLUIR CADASTRO PACIENTE":>28}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        cpf = input("\nInsira o CPF do paciente: ")
+
+        pac = Paciente(cpf, None, None, None, None, None, None)
+
+        pac.buscar_paciente()
+
+        check = input("\nDeseja confirmar a exclusão? ")
+
+        if check in "SssimSim":
+            pac.deletar_paciente()
+        else:
+            self.program()
+
+    def update_paciente(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"ALTERAR CADASTRO PACIENTE":>28}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("*Insira as novas informações*")
+        cpf = input("CPF: ")
+        nome = input("Nome: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = int(input("CEP: "))
+
+        pac = Paciente(cpf, nome, rua, bairro, cidade, cep)
+
+        pac.alterar_paciente()
 
 
 if __name__ == "__main__":
