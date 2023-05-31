@@ -340,7 +340,7 @@ class Enfermeira:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(f"\033[1;36m\Enfermeira(o) {self.nome}, inserido com sucesso!\033[m")
+            print(f"\033[1;36mEnfermeira(o) {self.nome}, inserido com sucesso!\033[m")
 
             db.conn.commit()
         except Exception as e:
@@ -422,17 +422,20 @@ class menufront:
         print("\033[1;36m-=\033[m" * 15)
         print("\n1 - Criar tabelas")
         print("")
+        print("Hospital")
         print("2 - Criar hospital")
         print("2.1 - Excluir hospital")
         print("2.2 - Alterar hospital")
         print("")
+        print("Médicos")
         print("3 - Criar médico(a)")
         print("3.1 - Deletar médico(a)")
         print("3.2 - Alterar médico(a)")
         print("")
+        print("Enfermeira")
         print("4 - Criar enfermeira(o)")
         print("4.1 - Deletar enfermeira(o)")
-        print("4.2 - Alterar enfermeira(o)(a)")
+        print("4.2 - Alterar enfermeira(o)")
         print("")
         print("7 - Sair")
 
