@@ -270,7 +270,7 @@ class Hospital:
             print("Erro ao deletar hospital:", str(e))
 
     def buscar_hospital(self):
-        query = "SELECT cnpj, nome FROM medico WHERE cnpj = (?)"
+        query = "SELECT cnpj, nome FROM hospital WHERE cnpj = (?)"
         parametros = (self.cnpj,)
 
         try:
@@ -315,6 +315,100 @@ class Hospital:
             db.desconectdb()
 
 
+class Enfermeira:
+    def __init__(self, coren, cpf, nome, rua, bairro, cidade, cep):
+        self.coren = coren
+        self.cpf = cpf
+        self.nome = nome
+        self.rua = rua
+        self.bairro = bairro
+        self.cidade = cidade
+        self.cep = cep
+
+    def inserir_enfermeira(self):
+        query = "INSERT INTO enfermeira (coren, cpf, nome, rua, bairro, cidade, cep) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        parametros = (
+            self.coren,
+            self.cpf,
+            self.nome,
+            self.rua,
+            self.bairro,
+            self.cidade,
+            self.cep,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\Enfermeira(o) {self.nome}, inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir hospital:", e)
+
+        finally:
+            db.desconectdb()
+
+    def deletar_enfermeira(self):
+        query = "DELETE FROM enfermeira WHERE coren = (?)"
+        parametros = (self.coren,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+            print(
+                f"\033[1;36m\nDados da enfermeira(o) {self.nome}, foram excluídos com sucesso!\033[m"
+            )
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao deletar enfermeira:", str(e))
+
+    def buscar_enfermeira(self):
+        query = "SELECT coren, nome FROM enfermeira WHERE coren = (?)"
+        parametros = (self.coren,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            for row in db.cursor.fetchall():
+                coren_sl = row[0]
+                nome_sl = row[1]
+            print(f"\nCOREN: {coren_sl}")
+            print(f"Nome: {nome_sl}")
+
+        except Exception as e:
+            print("Erro ao buscar enfermeira:", e)
+
+        finally:
+            db.desconectdb()
+
+    def alterar_enfermeira(self):
+        query = "UPDATE enfermeira SET coren = ?, cpf = ?, nome = ?, rua = ?, bairro = ?, cidade = ?, cep = ? WHERE coren = (?)"
+        parametros = (
+            self.coren,
+            self.cpf,
+            self.nome,
+            self.rua,
+            self.bairro,
+            self.cidade,
+            self.cep,
+        )
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nEnfermeira(o) {self.nome}, alterada com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("\033[1;31m\nErro ao alterar enfermeira:\033[m", e)
+
+        finally:
+            db.desconectdb()
+
+
 # Implementação do menu e chamada de métodos das entidades
 class menufront:
     def __init__(self):
@@ -327,20 +421,27 @@ class menufront:
         print(f'\033[1;36m{"MENU INICIAL":>22}\033[m')
         print("\033[1;36m-=\033[m" * 15)
         print("\n1 - Criar tabelas")
+        print("")
         print("2 - Criar hospital")
         print("2.1 - Excluir hospital")
         print("2.2 - Alterar hospital")
+        print("")
         print("3 - Criar médico(a)")
         print("3.1 - Deletar médico(a)")
         print("3.2 - Alterar médico(a)")
-        print("6 - Sair")
+        print("")
+        print("4 - Criar enfermeira(o)")
+        print("4.1 - Deletar enfermeira(o)")
+        print("4.2 - Alterar enfermeira(o)(a)")
+        print("")
+        print("7 - Sair")
 
     def program(self):
         print("\033[1;36m\nSEJA BEM VINDO...\033[m")
 
         self.acao = 0
 
-        while self.acao != 6:
+        while self.acao != 7:
             try:
                 self.menu()
                 self.acao = float(input("\nInsira a ação desejada: "))
@@ -359,15 +460,22 @@ class menufront:
                         self.delete_medico()
                     case 3.2:
                         self.update_medico()
-                    case 6:
-                        self.acao = 6
+                    case 4:
+                        self.insert_enfermeira()
+                    case 4.1:
+                        self.delete_enfermeira()
+                    case 4.2:
+                        self.update_enfermeira()
+                    case 7:
+                        self.acao = 7
                         print("\nSaindo... Até logo!")
-                if self.acao > 6 or self.acao < 1:
+                if self.acao > 7 or self.acao < 1:
                     print("\033[1;31m\nOops...Ação inválida. Tente novamente!\n\033[m")
 
             except ValueError:
                 print("\033[1;31m\nOops...Ação inválida. Tente novamente!\n\033[m")
 
+    # Instanciando métodos da entidade Médico
     def insert_medico(self):
         print("\033[1;36m-=\033[m" * 15)
         print(f'\033[1;36m{"CADASTRO DE MÉDICO(A)":>15}\033[m')
@@ -423,6 +531,7 @@ class menufront:
 
         medico.alterar_medico()
 
+    # Instanciando métodos da entidade Hospital
     def insert_hospital(self):
         print("\033[1;36m-=\033[m" * 15)
         print(f'\033[1;36m{"CADASTRO DE HOSPITAL":>20}\033[m')
@@ -477,6 +586,62 @@ class menufront:
         hosp = Hospital(cnpj, nome, rua, bairro, cidade, cep, tel)
 
         hosp.alterar_hospital()
+
+    # Instanciando métodos da entidade Enfermeira
+    def insert_enfermeira(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"CADASTRO DE ENFERMEIRA":>26}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        coren = input("COREN: ")
+        cpf = input("CPF: ")
+        nome = input("Nome: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = input("CEP: ")
+
+        enf = Enfermeira(coren, cpf, nome, rua, bairro, cidade, cep)
+
+        enf.inserir_enfermeira()
+
+    def delete_enfermeira(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"EXCLUIR CADASTRO ENFERMEIRA":>29}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        coren = input("\nInsira o COREN da enfermeira(o): ")
+
+        enf = Enfermeira(coren, None, None, None, None, None, None)
+
+        enf.buscar_enfermeira()
+
+        check = input("\nDeseja confirmar a exclusão? ")
+
+        if check in "SssimSim":
+            enf.deletar_enfermeira()
+        else:
+            self.program()
+
+    def update_enfermeira(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"ALTERAR CADASTRO ENFERMEIRA":>29}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("*Insira as novas informações*")
+        coren = input("COREN: ")
+        cpf = input("CPF: ")
+        nome = input("Nome: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = int(input("CEP: "))
+
+        enf = Enfermeira(coren, cpf, nome, rua, bairro, cidade, cep)
+
+        enf.alterar_enfermeira()
 
 
 if __name__ == "__main__":
