@@ -1,6 +1,7 @@
 import sqlite3 as sq
 
 
+# Implementação e criação do banco de dados
 class Database:
     def conectadb(self):
         self.conn = sq.connect("hospital.db")
@@ -18,20 +19,20 @@ class Database:
             # Criação da tabela do hospital
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS hospital( 
-                                cnpj INTEGER(13) PRIMARY KEY UNIQUE,
+                                cnpj TEXT(13) PRIMARY KEY UNIQUE,
                                 nome TEXT(20) NOT NULL,
                                 rua TEXT(50) NOT NULL,
                                 bairro TEXT(20) NOT NULL,
                                 cidade TEXT(20) NOT NULL,
-                                cep INTEGER(8) NOT NULL,
+                                cep TEXT(8) NOT NULL,
                                 telefone INTEGER(10) NOT NULL)"""
             )
 
             # Criação da tabela do medico
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS medico(
-                                crm INTEGER(10) PRIMARY KEY UNIQUE,
-                                cpf INTEGER(11) NOT NULL,
+                                crm TEXT(10) PRIMARY KEY UNIQUE,
+                                cpf TEXT(11) NOT NULL,
                                 nome TEXT(50) NOT NULL,
                                 rua TEXT(50) NOT NULL,
                                 bairro TEXT(20) NOT NULL,
@@ -92,8 +93,8 @@ class Database:
             # Criação da tabela enfermeira
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS enfermeira(
-                                coren INTEGER(10) PRIMARY KEY UNIQUE,
-                                cpf INTEGER(11) NOT NULL,
+                                coren TEXT(10) PRIMARY KEY UNIQUE,
+                                cpf TEXT(11) NOT NULL,
                                 nome TEXT(50) NOT NULL,
                                 rua TEXT(50) NOT NULL,
                                 bairro TEXT(20) NOT NULL,
@@ -104,11 +105,11 @@ class Database:
             # Criação da tabela paciente
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS paciente(
-                                cpf INTEGER(11) NOT NULL,
-                                nome INTEGER(50) NOT NULL,
-                                rua INTEGER(50) NOT NULL,
-                                bairro INTEGER(20) NOT NULL,
-                                cidade INTEGER(20) NOT NULL,
+                                cpf TEXT(11) NOT NULL,
+                                nome TEXT(50) NOT NULL,
+                                rua TEXT(50) NOT NULL,
+                                bairro TEXT(20) NOT NULL,
+                                cidade TEXT(20) NOT NULL,
                                 cep TEXT(8) NOT NULL)"""
             )
 
@@ -125,6 +126,7 @@ class Database:
 db = Database()
 
 
+# Cadastro de entidades
 class Medico:
     def __init__(self, crm, cpf, nome, rua, bairro, cidade, cep):
         super().__init__
@@ -151,9 +153,7 @@ class Medico:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(
-                f"\033[1;36m-=\033[m\nMédico {self.nome}, inserido com sucesso!\033[m"
-            )
+            print(f"\033[1;36m\nMédico {self.nome}, inserido com sucesso!\033[m")
 
             db.conn.commit()
         except Exception as e:
@@ -168,10 +168,12 @@ class Medico:
 
         try:
             db.executar_query(query, parametros)
-            print(f"Dados do médico(a) de CRM: {self.crm} foi excluído com sucesso!")
+            print(
+                f"\033[1;36m\nDados do médico(a) de CRM: {self.crm} foi excluído com sucesso!\033[m"
+            )
 
         except Exception as e:
-            print("Erro ao deletar medico:", str(e))
+            print("\033[1;31m\nErro ao deletar medico:\033[m", str(e))
 
     def buscar_medico(self):
         query = "SELECT crm, nome FROM medico WHERE crm = (?)"
@@ -209,18 +211,111 @@ class Medico:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(
-                f"\033[1;36m-=\033[m\nMédico {self.nome}, alterado com sucesso!\033[m"
-            )
+            print(f"\033[1;36m\nMédico {self.nome}, alterado com sucesso!\033[m")
 
             db.conn.commit()
         except Exception as e:
-            print("Erro ao inserir medico:", e)
+            print("\033[1;31m\nErro ao alterar medico:\033[m", e)
 
         finally:
             db.desconectdb()
 
 
+class Hospital:
+    def __init__(self, cnpj, nome, rua, bairro, cidade, cep, telefone):
+        self.cnpj = cnpj
+        self.nome = nome
+        self.rua = rua
+        self.bairro = bairro
+        self.cidade = cidade
+        self.cep = cep
+        self.telefone = telefone
+
+    def inserir_hospital(self):
+        query = "INSERT INTO hospital (cnpj, nome, rua, bairro, cidade, cep, telefone) VALUES (?, ?, ?, ?, ?, ?, ?)"
+        parametros = (
+            self.cnpj,
+            self.nome,
+            self.rua,
+            self.bairro,
+            self.cidade,
+            self.cep,
+            self.telefone,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nHospital {self.nome}, inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir hospital:", e)
+
+        finally:
+            db.desconectdb()
+
+    def deletar_hospital(self):
+        query = "DELETE FROM hospital WHERE cnpj = (?)"
+        parametros = (self.cnpj,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+            print(
+                f"\033[1;36m\nDados do Hospital {self.nome}, foram excluídos com sucesso!\033[m"
+            )
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao deletar hospital:", str(e))
+
+    def buscar_hospital(self):
+        query = "SELECT cnpj, nome FROM medico WHERE cnpj = (?)"
+        parametros = (self.cnpj,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            for row in db.cursor.fetchall():
+                cnpj_sl = row[0]
+                nome_sl = row[1]
+            print(f"\nCNPJ: {cnpj_sl}")
+            print(f"Nome: {nome_sl}")
+
+        except Exception as e:
+            print("Erro ao buscar hospital:", e)
+
+        finally:
+            db.desconectdb()
+
+    def alterar_hospital(self):
+        query = "UPDATE hospital SET cnpj = ?, nome = ?, rua = ?, bairro = ?, cidade = ?, cep = ?, telefone = ? WHERE cnpj = (?)"
+        parametros = (
+            self.cnpj,
+            self.nome,
+            self.rua,
+            self.bairro,
+            self.cidade,
+            self.cep,
+            self.telefone,
+        )
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nHospital {self.nome}, alterado com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("\033[1;31m\nErro ao alterar hospital:\033[m", e)
+
+        finally:
+            db.desconectdb()
+
+
+# Implementação do menu e chamada de métodos das entidades
 class menufront:
     def __init__(self):
         super().__init__()
@@ -233,35 +328,41 @@ class menufront:
         print("\033[1;36m-=\033[m" * 15)
         print("\n1 - Criar tabelas")
         print("2 - Criar hospital")
+        print("2.1 - Excluir hospital")
+        print("2.2 - Alterar hospital")
         print("3 - Criar médico(a)")
         print("3.1 - Deletar médico(a)")
         print("3.2 - Alterar médico(a)")
-        print("4 - Sair")
+        print("6 - Sair")
 
     def program(self):
         print("\033[1;36m\nSEJA BEM VINDO...\033[m")
 
         self.acao = 0
 
-        while self.acao != 4:
+        while self.acao != 6:
             try:
                 self.menu()
                 self.acao = float(input("\nInsira a ação desejada: "))
                 match self.acao:
                     case 1:
-                        self.criartabelas()
+                        db.criartabelas()
                     case 2:
-                        self.inserthospital()
+                        self.insert_hospital()
+                    case 2.1:
+                        self.delete_hospital()
+                    case 2.2:
+                        self.update_hospital()
                     case 3:
                         self.insert_medico()
                     case 3.1:
                         self.delete_medico()
                     case 3.2:
                         self.update_medico()
-                    case 4:
-                        self.acao = 4
+                    case 6:
+                        self.acao = 6
                         print("\nSaindo... Até logo!")
-                if self.acao > 4 or self.acao < 1:
+                if self.acao > 6 or self.acao < 1:
                     print("\033[1;31m\nOops...Ação inválida. Tente novamente!\n\033[m")
 
             except ValueError:
@@ -272,14 +373,14 @@ class menufront:
         print(f'\033[1;36m{"CADASTRO DE MÉDICO(A)":>15}\033[m')
         print("\033[1;36m-=\033[m" * 15)
 
-        crm = int(input("CRM: "))
-        cpf = int(input("CPF: "))
+        crm = input("CRM: ")
+        cpf = input("CPF: ")
         nome = input("Nome: ")
         print("*Endereço*")
         rua = input("Rua: ")
         bairro = input("Bairro: ")
         cidade = input("Cidade: ")
-        cep = int(input("CEP: "))
+        cep = input("CEP: ")
 
         medico = Medico(crm, cpf, nome, rua, bairro, cidade, cep)
 
@@ -290,7 +391,7 @@ class menufront:
         print(f'\033[1;36m{"EXCLUIR CADASTRO MEDICO":>26}\033[m')
         print("\033[1;36m-=\033[m" * 15)
 
-        crm = int(input("\nInsira o CRM do médico(a): "))
+        crm = input("\nInsira o CRM do médico(a): ")
 
         medico = Medico(crm, None, None, None, None, None, None)
 
@@ -309,8 +410,8 @@ class menufront:
         print("\033[1;36m-=\033[m" * 15)
 
         print("*Insira as novas informações*")
-        crm = int(input("CRM: "))
-        cpf = int(input("CPF: "))
+        crm = input("CRM: ")
+        cpf = input("CPF: ")
         nome = input("Nome: ")
         print("*Endereço*")
         rua = input("Rua: ")
@@ -321,6 +422,61 @@ class menufront:
         medico = Medico(crm, cpf, nome, rua, bairro, cidade, cep)
 
         medico.alterar_medico()
+
+    def insert_hospital(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"CADASTRO DE HOSPITAL":>20}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        cnpj = input("CNPJ: ")
+        nome = input("Nome: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = int(input("CEP: "))
+        telefone = int(input("Telefone: "))
+
+        hosp = Hospital(cnpj, nome, rua, bairro, cidade, cep, telefone)
+
+        hosp.inserir_hospital()
+
+    def delete_hospital(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"EXCLUIR CADASTRO HOSPITAL":>26}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        cnpj = input("\nInsira o CNPJ do hospital: ")
+
+        hosp = Hospital(cnpj, None, None, None, None, None, None)
+
+        hosp.buscar_hospital()
+
+        check = input("\nDeseja confirmar a exclusão? ")
+
+        if check in "SssimSim":
+            hosp.deletar_hospital()
+        else:
+            self.program()
+
+    def update_hospital(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"ALTERAR CADASTRO HOSPITAL":>27}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("*Insira as novas informações*")
+        cnpj = input("CNPJ: ")
+        nome = input("Nome: ")
+        print("*Endereço*")
+        rua = input("Rua: ")
+        bairro = input("Bairro: ")
+        cidade = input("Cidade: ")
+        cep = int(input("CEP: "))
+        tel = int(input("Telefone: "))
+
+        hosp = Hospital(cnpj, nome, rua, bairro, cidade, cep, tel)
+
+        hosp.alterar_hospital()
 
 
 if __name__ == "__main__":
