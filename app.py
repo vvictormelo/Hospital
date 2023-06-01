@@ -126,9 +126,8 @@ class Database:
 
 
 db = Database()
-
-
-# Implementação do menu e chamada de métodos das entidades
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+#  Implementação do menu e chamada de métodos das entidades
 class menufront:
     def __init__(self):
         super().__init__()
