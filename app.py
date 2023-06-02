@@ -44,51 +44,49 @@ class Database:
             # Criação da tabela auxiliar hospital x medico
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS hosp_med(
-                                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-                                id_cnpj REFERENCES hospital(cnpj),
-                                id_crm REFERENCES medico(crm))"""
+                                cnpj REFERENCES hospital(cnpj),
+                                crm REFERENCES medico(crm),
+                                PRIMARY KEY (cnpj, crm)) """
             )
 
             # Criação da tabela auxiliar hospital x enfermeira
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS hosp_enfer(
-                                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-                                id_cnpj REFERENCES hospital(cnpj),
-                                id_coren REFERENCES enfermeira(coren))"""
+                                cnpj REFERENCES hospital(cnpj),
+                                coren REFERENCES enfermeira(coren),
+                                PRIMARY KEY (cnpj, coren))"""
             )
 
             # Criação da tabela auxiliar medico x paciente
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS med_pac(
-                                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, 
-                                id_crm REFERENCES medico(crm),
-                                id_cpf REFERENCES paciente(cpf))"""
+                                crm REFERENCES medico(crm),
+                                cpf REFERENCES paciente(cpf),
+                                PRIMARY KEY (crm, cpf))"""
             )
 
             # Criação da tabela auxiliar medico x enfermeira
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS med_enf(
-                                id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, 
-                                id_crm REFERENCES medico(crm),
-                                id_coren REFERENCES enfermeira(coren))"""
+                                crm REFERENCES medico(crm),
+                                coren REFERENCES enfermeira(coren),
+                                PRIMARY KEY (crm, coren))"""
             )
 
             # Criação da tabela especialidade
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS especialidade(
-                                cod_esp INTEGER(4) PRIMARY KEY UNIQUE,
-                                documento TEXT(10) NOT NULL,
-                                especialidade_desc TEXT(50) NOT NULL,
-                                crm_medico REFERENCES medico(crm))"""
+                                cod INTEGER PRIMARY KEY AUTOINCREMENT,
+                                documento REFERENCES medico(crm),
+                                especi_desc TEXT(50) NOT NULL)"""
             )
 
             # Criação da tabela telefone
             self.cursor.execute(
                 """CREATE TABLE IF NOT EXISTS telefone(
-                                cod_num INTEGER(4) PRIMARY KEY UNIQUE,
-                                documento TEXT(10) NOT NULL,
-                                telefone INTEGER(10) NOT NULL,
-                                crm_medico REFERENCES medico(crm))"""
+                                cod INTEGER PRIMARY KEY AUTOINCREMENT,
+                                documento REFERENCES medico(crm),
+                                tel INTEGER NOT NULL)"""
             )
 
             # Criação da tabela enfermeira
@@ -126,7 +124,8 @@ class Database:
 
 
 db = Database()
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
+
 #  Implementação do menu e chamada de métodos das entidades
 class menufront:
     def __init__(self):
@@ -210,7 +209,7 @@ class menufront:
     # Instanciando métodos da entidade Médico
     def insert_medico(self):
         print("\033[1;36m-=\033[m" * 15)
-        print(f'\033[1;36m{"CADASTRO DE MÉDICO(A)":>15}\033[m')
+        print(f'\033[1;36m{"CADASTRO DE MÉDICO(A)":>26}\033[m')
         print("\033[1;36m-=\033[m" * 15)
 
         crm = input("CRM: ")
@@ -224,7 +223,16 @@ class menufront:
 
         medico = entities.Medico(crm, cpf, nome, rua, bairro, cidade, cep)
 
-        medico.inserir_medico()
+        verifi_telefone = input("Deseja cadastrar telefone?('Ss/Nn') ")
+
+        if verifi_telefone in "SssimSimSIM":
+            telefone = input("Telefone: ")
+
+            med_tel = entities.Telefone(crm, telefone)
+            medico.inserir_medico()
+            med_tel.inserir_telefone()
+        else:
+            medico.inserir_medico()
 
     def delete_medico(self):
         print("\033[1;36m-=\033[m" * 15)

@@ -1,3 +1,5 @@
-.venv
-.vscode
-.hospital.db
+*.venv
+
+*.vscode
+
+*hospital.db

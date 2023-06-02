@@ -121,7 +121,7 @@ class Hospital:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(f"\033[1;36m\nHospital {self.nome}, inserido com sucesso!\033[m")
+            print(f"\033[1;36m\n{self.nome}, inserido com sucesso!\033[m")
 
             db.conn.commit()
         except Exception as e:
@@ -215,7 +215,7 @@ class Enfermeira:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(f"\033[1;36mEnfermeira(o) {self.nome}, inserido com sucesso!\033[m")
+            print(f"\033[1;36m\nEnfermeira(o) {self.nome}, inserido com sucesso!\033[m")
 
             db.conn.commit()
         except Exception as e:
@@ -295,7 +295,7 @@ class Paciente:
         self.cep = cep
 
     def inserir_paciente(self):
-        query = "INSERT INTO paciente (cpf, rg, nome, rua, bairro, cidade, cep) VALUES (?, ?, ?, ?, ?, ?)"
+        query = "INSERT INTO paciente (cpf, rg, nome, rua, bairro, cidade, cep) VALUES (?, ?, ?, ?, ?, ?, ?)"
         parametros = (
             self.cpf,
             self.rg,
@@ -379,15 +379,13 @@ class Paciente:
 
 
 class Especialidade:
-    def __init__(self, cod, documento, especi):
-        self.cod = cod
+    def __init__(self, documento, especi):
         self.documento = documento
         self.especi = especi
 
     def inserir_especialidade(self):
-        query = "INSERT INTO especialidade (cod_esp, documento, especialidade_desc) VALUES (?, ?, ?)"
+        query = "INSERT INTO especialidade (documento, especi_desc) VALUES (?, ?)"
         parametros = (
-            self.cod,
             self.documento,
             self.especi,
         )
@@ -409,7 +407,7 @@ class Especialidade:
             db.desconectdb()
 
     def deletar_especialidade(self):
-        query = "DELETE FROM especialidade WHERE cod_esp = (?)"
+        query = "DELETE FROM especialidade WHERE cod = (?)"
         parametros = (self.cod,)
 
         try:
@@ -423,10 +421,8 @@ class Especialidade:
             print("Erro ao deletar especialidade:", str(e))
 
     def buscar_especialidade(self):
-        query = (
-            "SELECT cod_esp, especialidade_desc FROM especialidade WHERE cod_esp = (?)"
-        )
-        parametros = (self.cod_esp,)
+        query = "SELECT cod, especi_desc FROM especialidade WHERE cod = (?)"
+        parametros = (self.cod,)
 
         try:
             db.conectadb()
@@ -445,7 +441,7 @@ class Especialidade:
             db.desconectdb()
 
     def alterar_especialidade(self):
-        query = "UPDATE especialidade SET cod_esp = ?, documento = ?, especialidade_desc = ? WHERE cod_esp = (?)"
+        query = "UPDATE especialidade SET cod = ?, documento = ?, especi_desc = ? WHERE cod = (?)"
         parametros = (
             self.cod,
             self.documento,
@@ -469,26 +465,22 @@ class Especialidade:
 
 
 class Telefone:
-    def __init__(self, cod, documento, tele):
-        self.cod = cod
+    def __init__(self, documento, tele):
         self.documento = documento
-        self.tel = tele
+        self.tele = tele
 
     def inserir_telefone(self):
-        query = (
-            "INSERT INTO telefone (cod_esp, documento, telefone_desc) VALUES (?, ?, ?)"
-        )
+        query = "INSERT INTO telefone (documento, tel) VALUES ( ?, ?)"
         parametros = (
-            self.cod,
             self.documento,
-            self.especi,
+            self.tele,
         )
 
         try:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(f"\033[1;36m\ntelefone {self.especi}, inserido com sucesso!\033[m")
+            print(f"\033[1;36m\nTelefone inserido com sucesso!\033[m")
 
             db.conn.commit()
 
@@ -498,25 +490,21 @@ class Telefone:
         finally:
             db.desconectdb()
 
-    def deletar_especialidade(self):
-        query = "DELETE FROM especialidade WHERE cod_esp = (?)"
+    def deletar_telefone(self):
+        query = "DELETE FROM telefone WHERE cod = (?)"
         parametros = (self.cod,)
 
         try:
             db.conectadb()
             db.cursor.execute(query, parametros)
-            print(
-                f"\033[1;36m\nDados da especialidade, foram excluídos com sucesso!\033[m"
-            )
+            print(f"\033[1;36m\nDados do telefone, foram excluídos com sucesso!\033[m")
             db.conn.commit()
         except Exception as e:
-            print("Erro ao deletar especialidade:", str(e))
+            print("Erro ao deletar telefone:", str(e))
 
-    def buscar_especialidade(self):
-        query = (
-            "SELECT cod_esp, especialidade_desc FROM especialidade WHERE cod_esp = (?)"
-        )
-        parametros = (self.cod_esp,)
+    def buscar_telefone(self):
+        query = "SELECT cod, telFROM telefone WHERE cod = (?)"
+        parametros = (self.cod,)
 
         try:
             db.conectadb()
@@ -526,33 +514,33 @@ class Telefone:
                 cod_sl = row[0]
                 nome_sl = row[1]
             print(f"\nCódigo: {cod_sl}")
-            print(f"Especialidade: {nome_sl}")
+            print(f"Telefone: {nome_sl}")
 
         except Exception as e:
-            print("Erro ao buscar especialidade:", e)
+            print("Erro ao buscar telefone:", e)
 
         finally:
             db.desconectdb()
 
-    def alterar_especialidade(self):
-        query = "UPDATE especialidade SET cod_esp = ?, documento = ?, especialidade_desc = ? WHERE cod_esp = (?)"
+    def alterar_telefone(self):
+        query = (
+            "UPDATE especialidade SET cod = ?, documento = ?, tel = ? WHERE cod = (?)"
+        )
         parametros = (
             self.cod,
             self.documento,
-            self.especi,
+            self.tele,
         )
 
         try:
             db.conectadb()
             db.cursor.execute(query, parametros)
 
-            print(
-                f"\033[1;36m\nEspecialidade {self.especi}, alterado com sucesso!\033[m"
-            )
+            print(f"\033[1;36m\nTelefone {self.tele}, alterado com sucesso!\033[m")
 
             db.conn.commit()
         except Exception as e:
-            print("\033[1;31m\nErro ao alterar especialidade:\033[m", e)
+            print("\033[1;31m\nErro ao alterar telefone:\033[m", e)
 
         finally:
             db.desconectdb()
