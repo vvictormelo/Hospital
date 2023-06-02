@@ -42,7 +42,7 @@ class Medico:
         parametros = (self.crm,)
 
         try:
-            db.executar_query(query, parametros)
+            db.cursor.execute(query, parametros)
             print(
                 f"\033[1;36m\nDados do médico(a) de CRM: {self.crm} foi excluído com sucesso!\033[m"
             )
@@ -91,6 +91,23 @@ class Medico:
             db.conn.commit()
         except Exception as e:
             print("\033[1;31m\nErro ao alterar medico:\033[m", e)
+
+        finally:
+            db.desconectdb()
+
+    def listar_medicos(self):
+        query = "SELECT crm, nome FROM medico ORDER BY nome"
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query)
+
+            for medico in db.cursor.fetchall():
+                crm, nome = medico
+                print(f"""CRM: {crm} / Nome: {nome}""")
+
+        except Exception as e:
+            print("Erro ao buscar medicos:", e)
 
         finally:
             db.desconectdb()
@@ -189,6 +206,123 @@ class Hospital:
         finally:
             db.desconectdb()
 
+    def listar_hospitais(self):
+        query = "SELECT cnpj , nome FROM hospital ORDER BY nome"
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query)
+
+            for hospital in db.cursor.fetchall():
+                cnpj, nome = hospital
+                print(f"""CNPJ: {cnpj} / Nome: {nome}""")
+
+        except Exception as e:
+            print("Erro ao buscar hospitais:", e)
+
+        finally:
+            db.desconectdb()
+
+
+class HospMed:
+    def __init__(self, cnpj, crm):
+        self.cnpj = cnpj
+        self.crm = crm
+
+    def vinc_hospital_medicos(self):
+        query = "INSERT INTO hosp_med (cnpj, crm) VALUES (?, ?)"
+        parametros = (
+            self.cnpj,
+            self.crm,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nVínculo inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir vínculo:", e)
+
+        finally:
+            db.desconectdb()
+
+
+class HospEnf:
+    def __init__(self, cnpj, coren):
+        self.cnpj = cnpj
+        self.coren = coren
+
+    def vinc_hospital_medicos(self):
+        query = "INSERT INTO hosp_enfer (cnpj, coren) VALUES (?, ?)"
+        parametros = (
+            self.cnpj,
+            self.coren,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nVínculo inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir vínculo:", e)
+
+        finally:
+            db.desconectdb()
+
+
+class MedPac:
+    def __init__(self, crm, cpf):
+        self.crm = crm
+        self.cpf = cpf
+
+    def vinc_medicos_paciente(self):
+        query = "INSERT INTO med_pac (crm, cpf) VALUES (?, ?)"
+        parametros = (
+            self.crm,
+            self.cpf,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nVínculo inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir vínculo:", e)
+
+        finally:
+            db.desconectdb()
+
+
+class MedEnf:
+    def __init__(self, crm, coren):
+        self.crm = crm
+        self.coren = coren
+
+    def vinc_medicos_enfermeiros(self):
+        query = "INSERT INTO med_enf (crm, coren) VALUES (?, ?)"
+        parametros = (
+            self.crm,
+            self.coren,
+        )
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print(f"\033[1;36m\nVínculo inserido com sucesso!\033[m")
+
+            db.conn.commit()
+        except Exception as e:
+            print("Erro ao inserir vínculo:", e)
+
+        finally:
+            db.desconectdb()
+
 
 class Enfermeira:
     def __init__(self, coren, cpf, nome, rua, bairro, cidade, cep):
@@ -283,9 +417,26 @@ class Enfermeira:
         finally:
             db.desconectdb()
 
+    def listar_enfermeiros(self):
+        query = "SELECT coren , nome FROM enfermeira ORDER BY nome"
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query)
+
+            for hospital in db.cursor.fetchall():
+                coren, nome = hospital
+                print(f"""COREN: {coren} / Nome: {nome}""")
+
+        except Exception as e:
+            print("Erro ao buscar enfermeiros:", e)
+
+        finally:
+            db.desconectdb()
+
 
 class Paciente:
-    def __init__(self, rg, cpf, nome, rua, bairro, cidade, cep):
+    def __init__(self, cpf, rg, nome, rua, bairro, cidade, cep):
         self.cpf = cpf
         self.rg = rg
         self.nome = nome
@@ -373,6 +524,23 @@ class Paciente:
             db.conn.commit()
         except Exception as e:
             print("\033[1;31m\nErro ao alterar paciente:\033[m", e)
+
+        finally:
+            db.desconectdb()
+
+    def listar_pacientes(self):
+        query = "SELECT cpf , nome FROM paciente ORDER BY nome"
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query)
+
+            for paciente in db.cursor.fetchall():
+                cpf, nome = paciente
+                print(f"""CPF: {cpf} / Nome: {nome}""")
+
+        except Exception as e:
+            print("Erro ao buscar paciente:", e)
 
         finally:
             db.desconectdb()

@@ -159,6 +159,12 @@ class menufront:
         print("5.1 - Deletar paciente")
         print("5.2 - Alterar paciente")
         print("")
+        print("Vínculos")
+        print("6 - Vincular Hospital a Médico")
+        print("6.1 - Vincular Médico(a) a Enfermeira(o)")
+        print("6.2 - Vincular Hospital a Enfermeira(o)")
+        print("6.3 - Vincular Médico(a) a Paciente")
+        print("")
         print("7 - Sair")
 
     def program(self):
@@ -197,6 +203,14 @@ class menufront:
                         self.delete_paciente()
                     case 5.2:
                         self.update_paciente()
+                    case 6:
+                        self.vincular_med_hosp()
+                    case 6.1:
+                        self.vincular_med_enf()
+                    case 6.2:
+                        self.vincular_hosp_enf()
+                    case 6.3:
+                        self.vincular_med_pac()
                     case 7:
                         self.acao = 7
                         print("\nSaindo... Até logo!")
@@ -222,17 +236,24 @@ class menufront:
         cep = input("CEP: ")
 
         medico = entities.Medico(crm, cpf, nome, rua, bairro, cidade, cep)
+        medico.inserir_medico()
 
-        verifi_telefone = input("Deseja cadastrar telefone?('Ss/Nn') ")
+        verifi_telefone = input("\nDeseja cadastrar telefone?('Ss/Nn') ")
 
         if verifi_telefone in "SssimSimSIM":
             telefone = input("Telefone: ")
 
             med_tel = entities.Telefone(crm, telefone)
-            medico.inserir_medico()
             med_tel.inserir_telefone()
+
+        verifi_espe = input("\nDeseja cadastrar especialidade?('Ss/Nn') ")
+
+        if verifi_espe in "SssimSimSIM":
+            especialidade = input("Especialide: ")
+            med_espe = entities.Especialidade(crm, especialidade)
+            med_espe.inserir_especialidade()
         else:
-            medico.inserir_medico()
+            self.program()
 
     def delete_medico(self):
         print("\033[1;36m-=\033[m" * 15)
@@ -438,6 +459,75 @@ class menufront:
         pac = entities.Paciente(cpf, rg, nome, rua, bairro, cidade, cep)
 
         pac.alterar_paciente()
+
+    # Instanciando métodos de vínculos
+    def vincular_med_hosp(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"VÍNCULAR MÉDICO A HOSPITAL":>29}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("\nHospitais cadastados:")
+        entities.Hospital.listar_hospitais(self)
+
+        print("\nMédicos cadastados:")
+        entities.Medico.listar_medicos(self)
+
+        cnpj = input("\nInsira o CNPJ do hospital: ")
+        crm = input("Insira o CRM do médico: ")
+
+        hosp_med = entities.HospMed(cnpj, crm)
+        hosp_med.vinc_hospital_medicos()
+
+    def vincular_hosp_enf(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"VÍNCULAR ENFERMEIRA A HOSPITAL":>29}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("\nHospitais cadastados:")
+        entities.Hospital.listar_hospitais(self)
+
+        print("\nEnfermeiros cadastados:")
+        entities.Enfermeira.listar_enfermeiros(self)
+
+        cnpj = input("\nInsira o CNPJ do hospital: ")
+        coren = input("Insira o COREN do enfermeiro: ")
+
+        hosp_enf = entities.HospEnf(cnpj, coren)
+        hosp_enf.vinc_hospital_medicos()
+
+    def vincular_med_pac(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"VÍNCULAR MÉDICO A PACIENTE":>29}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("\nMédicos cadastados:")
+        entities.Medico.listar_medicos(self)
+
+        print("\nPacientes cadastados:")
+        entities.Paciente.listar_pacientes(self)
+
+        crm = input("\nInsira o CNPJ do hospital: ")
+        cpf = input("Insira o COREN do enfermeiro: ")
+
+        med_pac = entities.MedPac(crm, cpf)
+        med_pac.vinc_medicos_paciente()
+
+    def vincular_med_enf(self):
+        print("\033[1;36m-=\033[m" * 15)
+        print(f'\033[1;36m{"VÍNCULAR MÉDICO A ENFERMEIRO":>29}\033[m')
+        print("\033[1;36m-=\033[m" * 15)
+
+        print("\nMédicos cadastados:")
+        entities.Medico.listar_medicos(self)
+
+        print("\nEnfermeiros cadastados:")
+        entities.Enfermeira.listar_enfermeiros(self)
+
+        crm = input("\nInsira o CRM do médico: ")
+        coren = input("Insira o COREN do enfermeira: ")
+
+        med_enf = entities.MedEnf(crm, coren)
+        med_enf.vinc_medicos_enfermeiros()
 
 
 if __name__ == "__main__":
