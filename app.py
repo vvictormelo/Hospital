@@ -172,7 +172,7 @@ class menufront:
         print("7.3 - Relatório geral de hospitais")
         print("7.4 - Relatório de pacientes residentes no Centro de Aracaju")
         print("7.5 - Relatório médicos e telefones")
-        print("7.6 - Relatório do corpo clínico por hospital")
+        print("7.6 - Relatório do corpo clínico")
         print("")
         print("8 - Sair")
 
@@ -699,20 +699,41 @@ class menufront:
 
     def rel_corpo_clinico(self):
         print("\033[1;36m-=\033[m" * 15)
-        print(f'\033[1;36m{"RELATÓRIO CORPO CLÍNICO":>30}\033[m')
+        print(f'\033[1;36m{"RELATÓRIO CORPO CLÍNICO":>27}\033[m')
         print("\033[1;36m-=\033[m" * 15)
 
-        query = "select h.cnpj, h.nome, m.crm, m.nome, e.coren, e.nome from hospital h join hosp_med hm on h.cnpj = hm.cnpj join  medico m on m.crm = hm.crm join hosp_enfer he on he.cnpj = h.cnpj join enfermeira e on e.coren = he.coren order by h.cnpj"
+        query = "select cnpj, nome from hospital"
 
         try:
             db.conectadb()
             db.cursor.execute(query)
 
-            print("\Corpo Clínico cadastado:")
+            print("\nHospitais cadastados:")
+            for hospital in db.cursor.fetchall():
+                cnpj, nome = hospital
+                print(f"""CNPJ: {cnpj} / Nome: {nome}""")
+
+        except Exception as e:
+            print("Erro ao buscar hospital:", e)
+
+        finally:
+            db.desconectdb()
+
+        self.cnpj = input("\nInsira o CNPJ do hospital: ")
+
+        query = "select h.cnpj, h.nome, m.crm, m.nome, e.coren, e.nome from hospital h join hosp_med hm on h.cnpj = hm.cnpj join  medico m on m.crm = hm.crm join hosp_enfer he on he.cnpj = h.cnpj join enfermeira e on e.coren = he.coren where h.cnpj = (?) order by h.cnpj"
+        parametros = (self.cnpj,)
+
+        try:
+            db.conectadb()
+            db.cursor.execute(query, parametros)
+
+            print("\nCorpo Clínico:")
+
             for corpo in db.cursor.fetchall():
                 h_cnpj, h_nome, m_crm, m_nome, e_coren, e_nome = corpo
                 print(
-                    f"""Hospital - CNPJ: {h_cnpj} / Hospital - Nome: {h_nome} / Médico - CRM: {m_crm} / Médico - Nome: {m_nome} / Enfermério - COREN: {e_coren} / Enfermério - Nome: {e_nome}"""
+                    f"""CNPJ: {h_cnpj} / Nome: {h_nome} / Médico - CRM: {m_crm} / Médico - Nome: {m_nome} / Enfermério - COREN: {e_coren} / Enfermério - Nome: {e_nome}"""
                 )
 
         except Exception as e:
